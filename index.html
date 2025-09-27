@@ -21,7 +21,7 @@
     h2 {
       text-align: center;
       color: #2c3e50;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
     .instructions {
       font-size: 15px;
@@ -33,14 +33,6 @@
       border-radius: 6px;
       line-height: 1.6;
     }
-    .time-table {
-      margin-top: 10px;
-      font-size: 14px;
-      background-color: #f0f0f0;
-      padding: 10px;
-      border-radius: 6px;
-      line-height: 1.8;
-    }
     label {
       display: inline-block;
       width: 130px;
@@ -48,14 +40,16 @@
       color: #333;
     }
     input[type="number"], input[type="text"] {
-      width: 300px;
+      width: 80px;
       padding: 6px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      width: 300px;
     }
     button {
-      margin-top: 10px;
+      margin-top: 20px;
       padding: 10px 20px;
       background-color: #0078D7;
       color: white;
@@ -64,24 +58,33 @@
       cursor: pointer;
       font-size: 16px;
     }
-    button:hover {
-      background-color: #005a9e;
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
     }
     .result {
-      margin-top: 20px;
+      margin-top: 30px;
       background-color: #fefefe;
       padding: 20px;
       border-radius: 8px;
       border: 1px solid #ddd;
       font-size: 16px;
       color: #444;
+      min-height: 50px;
+    }
+    .time-table {
+      margin-top: 10px;
+      font-size: 14px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      line-height: 1.8;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>小六壬卦象查询 + AI智能解卦</h2>
-
     <div class="instructions">
       使用说明：<br>
       ① 第一个数字是农历月份，例如农历七月请输入数字 <strong>7</strong><br>
@@ -107,14 +110,12 @@
     <label>农历月份：</label><input type="number" id="n1" min="1" max="12"><br>
     <label>农历日期：</label><input type="number" id="n2" min="1" max="30"><br>
     <label>起念时辰：</label><input type="number" id="n3" min="1" max="12"><br>
-
-    <label>询问事项（可选）：</label>
-    <input type="text" id="userQuestion" placeholder="例如：东西丢了或问具体一件事..."><br>
+    <label>询问事宜（可选）：</label><input type="text" id="question" placeholder="例如：东西丢了"><br>
 
     <button onclick="calculate()">查询卦象</button>
     <div class="result" id="result"></div>
 
-    <button onclick="callAI()">AI智能解卦</button>
+    <button id="aiButton" onclick="callAI()">AI智能解卦</button>
     <div class="result" id="aiResult"></div>
   </div>
 
@@ -132,54 +133,64 @@
     ];
 
     function calculate() {
-      const n1=parseInt(document.getElementById("n1").value);
-      const n2=parseInt(document.getElementById("n2").value);
-      const n3=parseInt(document.getElementById("n3").value);
-      if(isNaN(n1)||isNaN(n2)||isNaN(n3)){ 
-        document.getElementById("result").innerHTML="⚠️ 请填写完整的三个数字。"; 
-        return; 
+      const n1 = parseInt(document.getElementById("n1").value);
+      const n2 = parseInt(document.getElementById("n2").value);
+      const n3 = parseInt(document.getElementById("n3").value);
+
+      if (isNaN(n1)||isNaN(n2)||isNaN(n3)){
+        document.getElementById("result").innerHTML="⚠️ 请填写完整的三个数字。";
+        return;
       }
-      const first=(n1-1)%elements.length;
-      const second=(n1+n2-2)%elements.length;
-      const third=(n1+n2+n3-3)%elements.length;
+
+      const firstIndex=(n1-1)%elements.length;
+      const secondIndex=(n1+n2-2)%elements.length;
+      const thirdIndex=(n1+n2+n3-3)%elements.length;
+
       document.getElementById("result").innerHTML=`
         <strong>卦象结果：</strong><br>
-        ① ${elements[first]}<br>
-        ② ${elements[second]}<br>
-        ③ ${elements[third]}
+        ① ${elements[firstIndex]}<br>
+        ② ${elements[secondIndex]}<br>
+        ③ ${elements[thirdIndex]}
       `;
     }
 
     async function callAI() {
-      const n1=parseInt(document.getElementById("n1").value);
-      const n2=parseInt(document.getElementById("n2").value);
-      const n3=parseInt(document.getElementById("n3").value);
-      if(isNaN(n1)||isNaN(n2)||isNaN(n3)){ 
-        document.getElementById("aiResult").innerHTML="⚠️ 请先填写完整的三个数字。"; 
-        return; 
+      const n1 = parseInt(document.getElementById("n1").value);
+      const n2 = parseInt(document.getElementById("n2").value);
+      const n3 = parseInt(document.getElementById("n3").value);
+      const question = document.getElementById("question").value.trim();
+
+      if (isNaN(n1)||isNaN(n2)||isNaN(n3)){
+        document.getElementById("aiResult").innerHTML="⚠️ 请先填写完整的三个数字。";
+        return;
       }
 
-      const first=(n1-1)%elements.length;
-      const second=(n1+n2-2)%elements.length;
-      const third=(n1+n2+n3-3)%elements.length;
+      const firstIndex=(n1-1)%elements.length;
+      const secondIndex=(n1+n2-2)%elements.length;
+      const thirdIndex=(n1+n2+n3-3)%elements.length;
 
-      const basePrompt=`我起到 ${elements[first]}、${elements[second]}、${elements[third]}，请根据小六壬帮我解卦，用于判断事情吉凶并给出建议。`;
-      const userQuestion=document.getElementById("userQuestion").value.trim();
-      const prompt=userQuestion ? `${basePrompt} 用户问题：${userQuestion}` : basePrompt;
+      let prompt = `我起到 ${elements[firstIndex]}、${elements[secondIndex]}、${elements[thirdIndex]}。`;
+      if(question) prompt += ` 我的问题是：${question}`;
+      prompt += " 请根据小六壬帮我解卦，用于判断事情吉凶并给出建议。";
 
+      const aiButton = document.getElementById("aiButton");
+      aiButton.disabled = true;
       document.getElementById("aiResult").innerHTML="⏳ 正在分析卦象，请稍候…";
 
       try {
-        const res = await fetch("/api/ai", {
+        const response = await fetch("/api/ai", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
           body:JSON.stringify({prompt})
         });
-        const data = await res.json();
-        document.getElementById("aiResult").innerHTML=`<strong>AI解卦：</strong><br>${data.reply}`;
-      } catch(e) {
+        const data = await response.json();
+        const reply = data.reply || "AI 没有返回内容，请重试";
+        document.getElementById("aiResult").innerHTML=`<strong>AI解卦：</strong><br>${reply}`;
+      } catch (e) {
         document.getElementById("aiResult").innerHTML="❌ 解卦失败，请检查网络或接口设置。";
         console.error(e);
+      } finally {
+        aiButton.disabled = false;
       }
     }
   </script>
