@@ -3,14 +3,14 @@ export async function onRequest(context) {
     const req = await context.request.json();
     const prompt = req.prompt; // 前端已经拼接卦象+用户问题
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.deepseek.com/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${context.env.OPENROUTER_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1:free",
+        model: "deepseek-chat",
         messages: [{ role: "user", content: prompt }]
       })
     });
@@ -29,3 +29,4 @@ export async function onRequest(context) {
     });
   }
 }
+
