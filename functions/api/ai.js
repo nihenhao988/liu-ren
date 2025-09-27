@@ -1,7 +1,7 @@
 export async function onRequest(context) {
   try {
     const req = await context.request.json();
-    const prompt = req.prompt;
+    const prompt = req.prompt; // 前端已经拼接卦象+用户问题
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
