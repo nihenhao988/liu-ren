@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>小六壬卦象查询 + AI解卦</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      background: linear-gradient(to right, #eef2f7, #dbe4f0);
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .instructions {
+      font-size: 15px;
+      color: #444;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-left: 4px solid #0078D7;
+      margin-bottom: 25px;
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    label {
+      display: inline-block;
+      width: 130px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    input[type="number"] {
+      width: 80px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+    .result {
+      margin-top: 30px;
+      background-color: #fefefe;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      color: #444;
+    }
+    .time-table {
+      margin-top: 10px;
+      font-size: 14px;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 6px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>小六壬卦象查询 + AI智能解卦</h2>
+    <div class="instructions">
+      使用说明：<br>
+      ① 第一个数字是农历月份，例如农历七月请输入数字 <strong>7</strong><br>
+      ② 第二个数字是农历日期，例如七月二十五请输入 <strong>25</strong><br>
+      ③ 第三个数字是你起念时的时辰，例如酉时（下午5点–7点）请输入 <strong>10</strong><br>
+      <div class="time-table">
+        十二时辰与数字对应：<br>
+        子时（晚上11点–凌晨1点）→ 1<br>
+        丑时（凌晨1点–3点）→ 2<br>
+        寅时（凌晨3点–5点）→ 3<br>
+        卯时（早上5点–7点）→ 4<br>
+        辰时（早上7点–9点）→ 5<br>
+        巳时（上午9点–11点）→ 6<br>
+        午时（中午11点–下午1点）→ 7<br>
+        未时（下午1点–3点）→ 8<br>
+        申时（下午3点–5点）→ 9<br>
+        酉时（下午5点–7点）→ 10<br>
+        戌时（晚上7点–9点）→ 11<br>
+        亥时（晚上9点–11点）→ 12
+      </div>
+    </div>
+
+    <label>农历月份：</label><input type="number" id="n1" min="1" max="12"><br>
+    <label>农历日期：</label><input type="number" id="n2" min="1" max="30"><br>
+    <label>起念时辰：</label><input type="number" id="n3" min="1" max="12"><br>
+    <button onclick="calculate()">查询卦象</button>
+    <div class="result" id="result"></div>
+
+    <button onclick="callAI()">AI智能解卦</button>
+    <div class="result" id="aiResult"></div>
+  </div>
+
+  <script>
+    const elements = [
+        "大安（震）（木）：平安吉祥，诸事顺遂",
+        "留连（坎）（水）：事情拖延，难以决断",
+        "速喜（离）（火）：喜事临门，好消息快来",
+        "赤口（兑）（金）：口舌是非，易生争执",
+        "小吉（巽）（木）：小有收获，平稳略好",
+        "空亡（震）（木）：虚无缥缈，难有结果",
+        "病符（坤）（土）：不适不顺，多有不便",
+        "桃花（艮）（土）：姻缘桃花，人际和谐",
+        "天德（乾）（金）：吉祥如意，贵人相助"
+
+    ];
+
+    function calculate() {
+      const n1 = parseInt(document.getElementById("n1").value);
+      const n2 = parseInt(document.getElementById("n2").value);
+      const n3 = parseInt(document.getElementById("n3").value);
+
+      if (isNaN(n1) || isNaN(n2) || isNaN(n3)) {
+        document.getElementById("result").innerHTML = "⚠️ 请填写完整的三个数字。";
+        return;
+      }
+
+      const firstIndex = (n1 - 1) % elements.length;
+      const secondIndex = (n1 + n2 - 2) % elements.length;
+      const thirdIndex = (n1 + n2 + n3 - 3) % elements.length;
+
+      const resultHTML = `
+        <strong>卦象结果：</strong><br>
+        ① ${elements[firstIndex]}<br>
+        ② ${elements[secondIndex]}<br>
+        ③ ${elements[thirdIndex]}
+      `;
+      document.getElementById("result").innerHTML = resultHTML;
+    }
+
+    async function callAI() {
+      const n1 = parseInt(document.getElementById("n1").value);
+      const n2 = parseInt(document.getElementById("n2").value);
+      const n3 = parseInt(document.getElementById("n3").value);
+
+      if (isNaN(n1) || isNaN(n2) || isNaN(n3)) {
+        document.getElementById("aiResult").innerHTML = "⚠️ 请先填写完整的三个数字。";
+        return;
+      }
+
+      const firstIndex = (n1 - 1) % elements.length;
+      const secondIndex = (n1 + n2 - 2) % elements.length;
+      const thirdIndex = (n1 + n2 + n3 - 3) % elements.length;
+
+      const prompt = `我起到 ${elements[firstIndex]}、${elements[secondIndex]}、${elements[thirdIndex]}，请根据小六壬帮我解卦，用于判断事情吉凶并给出建议。`;
+
+      document.getElementById("aiResult").innerHTML = "⏳ 正在分析卦象，请稍候…";
+
+      try {
+        const response = await fetch("/api/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+
+        if (data.reply) {
+          document.getElementById("aiResult").innerHTML = `<strong>AI解卦：</strong><br>${data.reply}`;
+        } else {
+          document.getElementById("aiResult").innerHTML = "❌ AI 没有返回结果。";
+        }
+      } catch (error) {
+        document.getElementById("aiResult").innerHTML = "❌ 解卦失败，请检查网络或接口设置。";
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>
