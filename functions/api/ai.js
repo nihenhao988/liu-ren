@@ -10,7 +10,7 @@ export async function onRequest(context) {
         "Authorization": `Bearer ${context.env.OPENROUTER_KEY}`
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-R1",
+        model: "deepseek-chat",
         messages: [{ role: "user", content: prompt }]
       })
     });
@@ -29,5 +29,6 @@ export async function onRequest(context) {
     });
   }
 }
+
 
 
